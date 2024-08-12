@@ -1,0 +1,42 @@
+﻿@page "/"
+@using BlazorAppPostClient.Data
+@inject HttpClient PostClient
+
+<PageTitle>Home</PageTitle>
+
+<h1>Do post call to Blazor Server App</h1>
+
+<button type="button" @onclick=DoCall>Call Post Endpoint</button>
+
+@if (!string.IsNullOrEmpty(BlazorServerPostMessage))
+{
+    <h2>Api response:</h2>
+    <p>@BlazorServerPostMessage</p>
+}
+
+
+@code {
+    string BlazorServerPostMessage = string.Empty;
+
+    async Task DoCall()
+    {
+        WeatherForecast data = new WeatherForecast
+            {
+                Date = DateTime.Today,
+                TemperatureC = 69,
+                Summary = $"This is a demo to add post data."
+            };
+        try
+        {
+            HttpResponseMessage responseMessage = await PostClient.PostAsJsonAsync("create-data", data);
+            responseMessage.EnsureSuccessStatusCode();
+            BlazorServerPostMessage = await responseMessage.Content.ReadAsStringAsync();
+
+        }
+        catch (Exception ex)
+        {
+            BlazorServerPostMessage = ex.Message;
+        }
+    }
+
+}
